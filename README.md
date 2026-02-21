@@ -45,26 +45,52 @@ A voice-enabled AI assistant that helps **immigrants and minorities** find low-c
 
 ## Quick Start
 
-### 1. Install dependencies
+**Prerequisites:** Python 3.9 or later, `pip`, and `git`.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Randemperson/Hacklytics2026Project.git
+cd Hacklytics2026Project
+```
+
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run the web app
+> **Tip:** use a virtual environment to keep packages isolated:
+> ```bash
+> python -m venv .venv
+> source .venv/bin/activate   # macOS / Linux
+> .venv\Scripts\activate      # Windows
+> pip install -r requirements.txt
+> ```
+
+### 3. Run the web app
 
 ```bash
 python app.py
-# Open http://localhost:5000
 ```
 
-### 3. Run the CLI chatbot
+Then open **http://localhost:5000** in your browser. You should see the chat
+panel on the left and the filter panel on the right. Type (or click the 🎤
+button) to ask for housing, for example:
+
+> *"2 bedroom apartment under $800 in Atlanta with Spanish-speaking agent"*
+
+Matching listings will appear below as cards with agent contact details.
+
+### 4. Run the CLI chatbot (no browser needed)
 
 ```bash
 python -c "from src.chatbot import Chatbot; Chatbot().run_cli()"
 ```
 
-### 4. Enable voice in CLI (optional)
+Type queries at the `You:` prompt. Type `quit` to exit.
+
+### 5. Enable voice in CLI (optional)
 
 ```bash
 # Install audio packages first
@@ -72,6 +98,16 @@ pip install SpeechRecognition pyttsx3
 
 python -c "from src.chatbot import Chatbot; Chatbot(voice_enabled=True).run_cli()"
 ```
+
+The assistant will listen on your default microphone and speak results aloud.
+
+### 6. Run the tests
+
+```bash
+pytest tests/ -v
+```
+
+All 41 tests should pass with no configuration required.
 
 ---
 
@@ -122,23 +158,79 @@ Without credentials, the system still shows the agent's direct phone and email o
 
 ---
 
-## Housing Dataset
+## About the Housing Data
 
-The dataset (`data/housing_data.csv`) covers the **Atlanta metro area** and includes:
-- Monthly rent, bedrooms, bathrooms, square footage
-- Section 8 acceptance, HUD approval, low-income eligibility, AMI % limit
-- Transit access, utilities included, pet policy, accessibility features
-- Agent name, phone, email, and languages spoken
+### Where does the data come from?
 
-The AI scores each listing on **affordability, low-income eligibility, Section 8, HUD approval, transit access, utilities, and accessibility** to surface the best options first.
+`data/housing_data.csv` is **synthetic** — the listings, agent names, phone
+numbers, and email addresses are **fictitious** and were hand-crafted for this
+project. They were designed to reflect realistic patterns for affordable
+housing in the **Atlanta, GA metro area** (rent levels, neighborhood names,
+ZIP codes, transit access) based on publicly available information about the
+region, but **no real rental listings or real people are represented**.
 
----
+The phone numbers all use the `555` exchange (a standard placeholder for
+fictional US numbers), and the email addresses point to non-existent domains.
 
-## Running Tests
+### Why synthetic data?
 
-```bash
-pytest tests/ -v
-```
+Real affordable-housing databases require licensing agreements or API keys and
+may contain personally identifiable information. Synthetic data lets the
+project demonstrate all AI and voice features without those dependencies, and
+without exposing anyone's private information.
+
+### Dataset schema
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | int | Unique listing identifier |
+| `address` | string | Street address |
+| `city` | string | City name |
+| `state` | string | Two-letter state code (all `GA`) |
+| `zip_code` | int | US ZIP code |
+| `monthly_rent` | int | Monthly rent in USD |
+| `bedrooms` | int | Number of bedrooms |
+| `bathrooms` | float | Number of bathrooms |
+| `sqft` | int | Approximate square footage |
+| `property_type` | string | `Apartment`, `House`, `Townhouse`, … |
+| `nearby_transit` | bool | `Yes` / `No` — whether public transit is nearby |
+| `languages_spoken` | string | Comma-separated list of languages the agent speaks |
+| `agent_name` | string | Listing agent's full name |
+| `agent_phone` | string | Agent phone number (fictitious `555` numbers) |
+| `agent_email` | string | Agent email address (fictitious domains) |
+| `section8_accepted` | bool | Whether the landlord accepts Section 8 vouchers |
+| `hud_approved` | bool | Whether the property is HUD-approved |
+| `low_income_eligible` | bool | Whether the unit qualifies for low-income programs |
+| `income_limit_percent_ami` | int | Maximum qualifying household income as % of Area Median Income |
+| `utilities_included` | string | Which utilities are included (e.g. `Water/Trash`), or `None` |
+| `pets_allowed` | bool | Whether pets are allowed |
+| `accessibility_features` | string | Accessibility features (e.g. `Wheelchair ramp`, `Elevator`), or `None` |
+| `neighborhood_description` | string | Short free-text description |
+| `latitude` | float | Approximate latitude |
+| `longitude` | float | Approximate longitude |
+
+### How to use real data
+
+To replace the synthetic listings with real ones, swap out
+`data/housing_data.csv` with a file that uses the same column headers.
+Useful public sources include:
+
+| Source | URL | What it contains |
+|--------|-----|-----------------|
+| **HUD Fair Market Rents** | https://www.huduser.gov/portal/datasets/fmr.html | Official FMR data by metro/county |
+| **HUD LIHTC Database** | https://lihtc.huduser.gov | Low-Income Housing Tax Credit properties nationwide |
+| **Atlanta Housing Authority** | https://atlantahousing.org | Public housing and voucher programs |
+| **Georgia DCA Housing Search** | https://www.dca.ga.gov/safe-affordable-housing | State-level affordable housing locator |
+| **HUD's Affordable Apartment Search** | https://www.hud.gov/topics/rental_assistance | HUD-assisted rental search |
+| **OpenStreetMap / Overpass API** | https://overpass-api.de | Geocoding and neighborhood data |
+| **Zillow Research Data** | https://www.zillow.com/research/data | Public rental-price datasets (CSV) |
+
+See [`data/DATA_SOURCES.md`](data/DATA_SOURCES.md) for detailed guidance on
+ingesting real data into this project.
+
+The AI scores each listing on **affordability, low-income eligibility,
+Section 8, HUD approval, transit access, utilities, and accessibility** to
+surface the best options first.
 
 ---
 
