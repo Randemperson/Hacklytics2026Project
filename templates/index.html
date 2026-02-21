@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real Estate AI — Affordable Housing Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">🏠 Real Estate AI</div>
+      <p class="tagline">Helping immigrants &amp; minorities find affordable housing</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ===== Chat Panel ===== -->
+    <section class="chat-panel card">
+      <h2>Ask the Assistant</h2>
+      <p class="hint">
+        Try: <em>"2-bedroom apartments under $800 in Atlanta"</em> &nbsp;|&nbsp;
+        <em>"Section 8 housing with Spanish-speaking agents"</em> &nbsp;|&nbsp;
+        <em>"Wheelchair accessible near transit"</em>
+      </p>
+
+      <div id="chat-history" class="chat-history" aria-live="polite"></div>
+
+      <div class="input-row">
+        <input
+          id="chat-input"
+          type="text"
+          placeholder="Type your question or click the mic…"
+          autocomplete="off"
+          aria-label="Chat input"
+        />
+        <button id="mic-btn" class="btn btn-mic" title="Voice input" aria-label="Start voice input">
+          🎤
+        </button>
+        <button id="send-btn" class="btn btn-primary" aria-label="Send message">Send</button>
+      </div>
+      <p id="mic-status" class="mic-status" aria-live="polite"></p>
+    </section>
+
+    <!-- ===== Structured Filter Panel ===== -->
+    <section class="filter-panel card">
+      <h2>Filter Listings</h2>
+      <form id="filter-form" class="filter-form">
+        <div class="form-row">
+          <label for="max_rent">Max Rent ($/mo)</label>
+          <input type="number" id="max_rent" name="max_rent" min="{{ min_rent }}" max="{{ max_rent }}" placeholder="e.g. 800" />
+        </div>
+        <div class="form-row">
+          <label for="min_bedrooms">Min Bedrooms</label>
+          <input type="number" id="min_bedrooms" name="min_bedrooms" min="0" max="5" placeholder="e.g. 2" />
+        </div>
+        <div class="form-row">
+          <label for="city">City</label>
+          <select id="city" name="city">
+            <option value="">Any</option>
+            {% for c in cities %}
+            <option value="{{ c }}">{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="language">Agent Language</label>
+          <select id="language" name="language">
+            <option value="">Any</option>
+            {% for lang in languages %}
+            <option value="{{ lang }}">{{ lang }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row checkboxes">
+          <label><input type="checkbox" name="section8" value="true" /> Section 8 accepted</label>
+          <label><input type="checkbox" name="hud_approved" value="true" /> HUD approved</label>
+          <label><input type="checkbox" name="low_income_only" value="true" /> Low-income eligible</label>
+          <label><input type="checkbox" name="needs_transit" value="true" /> Near public transit</label>
+          <label><input type="checkbox" name="pets_allowed" value="true" /> Pets allowed</label>
+          <label><input type="checkbox" name="accessibility" value="true" /> Accessibility features</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </section>
+
+    <!-- ===== Results ===== -->
+    <section id="results-section" class="results-section" aria-live="polite" hidden>
+      <h2>Listings</h2>
+      <div id="results-grid" class="results-grid"></div>
+    </section>
+  </main>
+
+  <!-- ===== Contact Modal ===== -->
+  <div id="contact-modal" class="modal-overlay" hidden>
+    <div class="modal card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h3 id="modal-title">Contact Agent</h3>
+      <p id="modal-listing-info" class="modal-listing-info"></p>
+      <form id="contact-form">
+        <input type="hidden" id="contact-listing-id" />
+        <div class="form-row">
+          <label for="contact-name">Your Name</label>
+          <input type="text" id="contact-name" required placeholder="Full name" />
+        </div>
+        <div class="form-row">
+          <label for="contact-phone">Your Phone</label>
+          <input type="tel" id="contact-phone" required placeholder="+1 555 000 0000" />
+        </div>
+        <div class="form-row">
+          <label for="contact-email">Your Email</label>
+          <input type="email" id="contact-email" placeholder="you@example.com" />
+        </div>
+        <div class="form-row">
+          <label for="contact-language">Preferred Language</label>
+          <select id="contact-language">
+            <option value="English">English</option>
+            <option value="Spanish">Spanish</option>
+            <option value="French">French</option>
+            <option value="Amharic">Amharic</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="contact-method">Contact Method</label>
+          <select id="contact-method">
+            <option value="email">Email</option>
+            <option value="call">Phone Call</option>
+            <option value="sms">SMS</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Contact Agent</button>
+          <button type="button" id="modal-close" class="btn btn-secondary">Cancel</button>
+        </div>
+        <p id="contact-result" class="contact-result" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
